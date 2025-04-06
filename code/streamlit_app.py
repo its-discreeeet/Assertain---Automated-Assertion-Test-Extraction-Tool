@@ -7,7 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from assertion_extractor import clone_github_repo, get_test_files, analyze_file, extract_repo_name
 
-# Set page title and description
+
 st.set_page_config(page_title="Python Test Assertion Extractor", layout="wide")
 st.title("Python Test Assertion Extractor")
 st.markdown("""
@@ -15,8 +15,7 @@ This app extracts test assertions from Python GitHub repositories and generates 
 Enter a GitHub repository URL to analyze its test assertions.
 """)
 
-# GitHub URL input
-github_url = st.text_input("Enter GitHub Repository URL", "https://github.com/psf/requests")
+github_url = st.text_input("Enter GitHub Repository URL")
 
 progress_placeholder = st.empty()
 result_placeholder = st.empty()
@@ -25,55 +24,55 @@ if st.button("Extract Assertions"):
     if not github_url or not github_url.startswith("https://github.com/"):
         st.error("Please enter a valid GitHub repository URL")
     else:
-        # Create a progress bar
+        
         progress_bar = progress_placeholder.progress(0)
         
         with st.spinner("Cloning repository..."):
-            # Clone the repository
+            
             try:
                 repo_dir = clone_github_repo(github_url)
                 progress_bar.progress(25)
                 
-                # Find test files
+                # find the test files
                 test_files = get_test_files(repo_dir)
                 st.info(f"Found {len(test_files)} test files")
                 progress_bar.progress(50)
                 
-                # Analyze each file and collect assertions
+             
                 all_assertions = []
                 file_count = len(test_files)
                 
                 for i, file_path in enumerate(test_files):
                     file_assertions = analyze_file(file_path)
                     all_assertions.extend(file_assertions)
-                    # Update progress based on files processed
+                    # progress bar updation logic
                     progress_percent = 50 + int((i / file_count) * 40)
                     progress_bar.progress(min(90, progress_percent))
                 
-                # Create DataFrame and CSV
+              
                 if all_assertions:
                     df = pd.DataFrame(all_assertions)
                     progress_bar.progress(95)
                     
-                    # Create downloadable CSV
+                   
                     repo_name = extract_repo_name(github_url)
                     csv_data = df.to_csv(index=False)
                     
                     progress_bar.progress(100)
                     progress_placeholder.empty()
                     
-                    # Display results
+                   
                     result_placeholder.success(f"Found {len(all_assertions)} assertions in {file_count} files")
                     
-                    # Create tabs for different views
+                    #tabs for different pages
                     tab1, tab2, tab3 = st.tabs(["Data", "Visualizations", "Statistics"])
                     
                     with tab1:
-                        # Show data table with sortable columns
+                        # made a table with sortable cols
                         st.subheader("Assertion Data")
                         st.dataframe(df, use_container_width=True)
                         
-                        # Download button
+                        
                         st.download_button(
                             label="Download CSV",
                             data=csv_data,
@@ -84,18 +83,18 @@ if st.button("Extract Assertions"):
                     with tab2:
                         st.subheader("Visualization Dashboard")
                         
-                        # Create two columns for charts
+                        # 2 columns (cols for short) for charts
                         col1, col2 = st.columns(2)
                         
                         with col1:
-                            # Prepare data for visualizations
+                           
                             # 1. Assertions per file (top 10)
                             file_counts = df['filepath'].value_counts().reset_index().head(10)
                             file_counts.columns = ['Filepath', 'Count']
                             # Extract just the filename from the full path for cleaner display
                             file_counts['Filename'] = file_counts['Filepath'].apply(lambda x: os.path.basename(x))
                             
-                            # Create bar chart for file distribution
+                            # bar chart for file dist
                             fig1 = px.bar(
                                 file_counts, 
                                 x='Count', 
@@ -108,13 +107,13 @@ if st.button("Extract Assertions"):
                             st.plotly_chart(fig1, use_container_width=True)
                             
                         with col2:
-                            # 2. Pie chart for test class distribution
+                            # 2. pie chart
                             if 'testclass' in df.columns and df['testclass'].notna().sum() > 0:
                                 # Filter out empty test classes and get top classes
                                 class_counts = df[df['testclass'] != '']['testclass'].value_counts().reset_index()
                                 class_counts.columns = ['Test Class', 'Count']
                                 
-                                # Take top 10 classes and group the rest as "Others"
+                                # top 10 classes, we group the reamining ones as 'others'
                                 top_classes = class_counts.head(10)
                                 if len(class_counts) > 10:
                                     others_count = class_counts['Count'][10:].sum()
@@ -134,12 +133,11 @@ if st.button("Extract Assertions"):
                             else:
                                 st.info("No test class data available for visualization")
                         
-                        # Create another row for additional charts
+                       
                         col3, col4 = st.columns(2)
                         
                         with col3:
-                            # 3. Assertion types (looking for patterns in assertion strings)
-                            # Extract assertion types based on keywords in assert strings
+                            # 3. assertion types (looking for patterns in assertion strings)
                             def categorize_assertion(assert_str):
                                 assert_str = assert_str.lower()
                                 if "equal" in assert_str:
@@ -177,8 +175,7 @@ if st.button("Extract Assertions"):
                             st.plotly_chart(fig3, use_container_width=True)
                         
                         with col4:
-                            # 4. Directory heatmap (showing assertion concentration by directory)
-                            # Extract directory from filepath
+                            # 4. Directory heatmap (it shows the assertion concentration by directory basically)
                             df['directory'] = df['filepath'].apply(lambda x: os.path.dirname(x).split('/')[-1] if '/' in x else 'root')
                             dir_counts = df['directory'].value_counts().reset_index().head(15)
                             dir_counts.columns = ['Directory', 'Count']
@@ -196,33 +193,32 @@ if st.button("Extract Assertions"):
                     with tab3:
                         st.subheader("Assertion Statistics")
                         
-                        # Statistics row 1
+                       
                         stat_col1, stat_col2, stat_col3 = st.columns(3)
                         
                         with stat_col1:
-                            # Total assertions counter
+                            
                             st.metric("Total Assertions", len(df))
                         
                         with stat_col2:
-                            # Average assertions per file
+                            
                             avg_per_file = round(len(df) / len(df['filepath'].unique()), 2)
                             st.metric("Avg. Assertions per File", avg_per_file)
                         
                         with stat_col3:
-                            # Count of test classes
+                            
                             if 'testclass' in df.columns:
                                 test_class_count = len(df[df['testclass'] != '']['testclass'].unique())
                                 st.metric("Unique Test Classes", test_class_count)
                             else:
                                 st.metric("Unique Test Classes", 0)
                         
-                        # Statistics row 2
                         st.subheader("Top Test Functions")
                         func_counts = df['testname'].value_counts().head(10).reset_index()
                         func_counts.columns = ['Test Function', 'Assertion Count']
                         st.dataframe(func_counts, use_container_width=True)
                         
-                        # Statistics row 3
+                        
                         st.subheader("Files with Most Assertions")
                         file_stats = df.groupby('filepath').agg({
                             'line_number': 'count', 
@@ -238,7 +234,7 @@ if st.button("Extract Assertions"):
                     progress_placeholder.empty()
                     result_placeholder.warning("No assertions found in this repository")
                 
-                # Clean up temporary directory
+                # clean up the temp directory after use is over
                 import shutil
                 shutil.rmtree(repo_dir, ignore_errors=True)
                 
@@ -246,7 +242,7 @@ if st.button("Extract Assertions"):
                 progress_placeholder.empty()
                 result_placeholder.error(f"Error: {str(e)}")
 
-# Add documentation at the bottom
+# some documentation for guidance
 with st.expander("How it works"):
     st.markdown("""
     ### How the Assertion Extractor Works
@@ -271,10 +267,4 @@ with st.expander("How it works"):
     - Standard Python `assert` statements
     - unittest assertion methods (`assertEqual`, `assertTrue`, etc.)
     - Common test framework assertions
-    
-    ### Limitations
-    
-    - May miss dynamically generated assertions
-    - Might not detect custom assertion functions without standard naming
-    - Complex inheritance hierarchies might not be fully resolved
     """)

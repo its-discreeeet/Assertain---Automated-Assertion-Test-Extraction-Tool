@@ -1,8 +1,10 @@
+# Use an official Python runtime as the base image
 FROM python:3.9-slim
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install git and other dependencies
+# Install Git and other dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends git && \
     apt-get clean && \
@@ -12,14 +14,11 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the assertion extractor
-COPY assertion_extractor.py .
+# Copy the assertion extractor script
+COPY code/assertion_extractor.py code/
 
-# Make the script executable
-RUN chmod +x assertion_extractor.py
+# Set the entry point to run the script
+ENTRYPOINT ["python", "code/assertion_extractor.py"]
 
-# Set the entry point
-ENTRYPOINT ["python", "assertion_extractor.py"]
-
-# Default command (can be overridden)
+# Provide a default GitHub repository URL
 CMD ["https://github.com/requests/requests"]

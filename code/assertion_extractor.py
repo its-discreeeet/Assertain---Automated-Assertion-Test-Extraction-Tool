@@ -136,7 +136,7 @@ def analyze_file(file_path: str) -> List[Dict]:
         return []
 
 def clone_github_repo(github_url: str) -> str:
-    """Clone a GitHub repository and return the path to the cloned directory."""
+    
     temp_dir = tempfile.mkdtemp()
     logger.info(f"Cloning {github_url} to {temp_dir}")
     
@@ -148,7 +148,7 @@ def clone_github_repo(github_url: str) -> str:
         sys.exit(1)
 
 def write_assertions_to_csv(assertions: List[Dict], output_file: str):
-    """Write assertions to a CSV file."""
+    
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['filepath', 'testclass', 'testname', 'line number', 'assert string'])
@@ -163,7 +163,7 @@ def write_assertions_to_csv(assertions: List[Dict], output_file: str):
             ])
 
 def extract_repo_name(github_url: str) -> str:
-    """Extract repository name from GitHub URL."""
+   
     if github_url.endswith('/'):
         github_url = github_url[:-1]
     return github_url.split('/')[-1]
@@ -177,21 +177,21 @@ def main():
     repo_name = extract_repo_name(github_url)
     output_file = f"{repo_name}_assertions.csv"
     
-    # Clone the repository
+    
     repo_dir = clone_github_repo(github_url)
     
-    # Find all test files
+    # find all test files
     test_files = get_test_files(repo_dir)
     logger.info(f"Found {len(test_files)} test files")
     
-    # Analyze each file
+    
     all_assertions = []
     for file_path in test_files:
         logger.info(f"Analyzing {file_path}")
         file_assertions = analyze_file(file_path)
         all_assertions.extend(file_assertions)
     
-    # Write results to CSV
+    # output csv generation
     write_assertions_to_csv(all_assertions, output_file)
     logger.info(f"Found {len(all_assertions)} assertions in total")
     logger.info(f"Results written to {output_file}")
