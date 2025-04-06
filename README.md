@@ -54,3 +54,9 @@ python assertion_extractor.py <github repo url>
 cd code
 streamlit run app.py
 ```
+
+**A few of the repositories for which this tool is useful for** :-
+- PyTest : https://github.com/pytest-dev/pytest
+- Flask : https://github.com/pallets/flask
+- Requests : https://github.com/psf/requests
+Paste them directly to see the results
