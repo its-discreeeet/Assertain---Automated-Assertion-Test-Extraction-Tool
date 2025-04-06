@@ -60,4 +60,4 @@ streamlit run app.py
 - Flask : https://github.com/pallets/flask
 - Requests : https://github.com/psf/requests
 
-Paste them directly to see the results
+Use repositories like these to see results
