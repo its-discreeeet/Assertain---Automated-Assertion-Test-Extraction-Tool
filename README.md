@@ -26,13 +26,13 @@
 
 ## Running Locally
 
-### Step 1: Clone the Repository
+### Clone the Repository
 ```
 git clone https://github.com/its-discreeeet/exercise-uiuc--2025.git
 cd <path-to-this-directory>
 ```
 
-### Step 2: Install Dependencies
+### Install Dependencies
 ```
 pip install -r requirements.txt
 ```
