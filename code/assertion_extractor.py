@@ -58,17 +58,31 @@ class AssertionVisitor(ast.NodeVisitor):
         self.generic_visit(node)
         
     def visit_Call(self, node):
-        # Check for assertEqual, assertTrue, etc. in test frameworks like unittest or pytest
-        if isinstance(node.func, ast.Attribute) and node.func.attr.startswith(('assert', 'Assert')):
-            line_num = node.lineno
-            if line_num in self.line_mapping:
-                assert_string = self.line_mapping[line_num]
-            else:
-                assert_string = f"Assertion method at line {line_num}"
+        # Check if the function call is pytest.raises
+        if isinstance(node.func, ast.Attribute) and node.func.attr == 'raises':
+            if isinstance(node.func.value, ast.Name) and node.func.value.id == 'pytest':
+                line_num = node.lineno
+                assert_string = f"pytest.raises at line {line_num}"
                 
+                if self.current_function and (self.current_function.startswith('test_') or 
+                                            self.current_function.startswith('Test') or 
+                                            'test' in self.current_function.lower()):
+                    self.assertions.append({
+                        'filepath': self.filepath,
+                        'testclass': self.current_class or '',
+                        'testname': self.current_function,
+                        'line_number': line_num,
+                        'assert_string': assert_string.strip()
+                    })
+        
+        # Handle other assertion methods (e.g., self.assertEqual, assertTrue)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr.startswith(('assert', 'Assert')):
+            line_num = node.lineno
+            assert_string = f"Assertion method at line {line_num}"
+            
             if self.current_function and (self.current_function.startswith('test_') or 
-                                           self.current_function.startswith('Test') or 
-                                           'test' in self.current_function.lower()):
+                                        self.current_function.startswith('Test') or 
+                                        'test' in self.current_function.lower()):
                 self.assertions.append({
                     'filepath': self.filepath,
                     'testclass': self.current_class or '',
@@ -76,7 +90,10 @@ class AssertionVisitor(ast.NodeVisitor):
                     'line_number': line_num,
                     'assert_string': assert_string.strip()
                 })
+        
+        # Recursively visit child nodes
         self.generic_visit(node)
+        
 
 def build_line_mapping(file_path: str) -> Dict[int, str]:
     """Build a mapping from line numbers to line content."""

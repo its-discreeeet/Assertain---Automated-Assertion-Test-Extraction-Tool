@@ -1,2 +1,3 @@
 gitpython
 streamlit
+pytest
