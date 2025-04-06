@@ -17,15 +17,16 @@
 ---
 
 ## Project Structure
-exercise-uiuc--2025/ # Root directory
-├── code/ 
-│ ├── app.py # Streamlit-based GUI application
-│ └── assertion_extractor.py # tool
-├── answers.txt # File containing answers to questions
-├── Dockerfile # Docker configuration for containerization
-├── requirements.txt # Python dependencies for the project
-└── run.sh # Helper script to run the tool locally
-
+exercise-uiuc--2025/
+|
+├── code/
+|   ├── app.py                # Streamlit-based GUI application
+|   └── assertion_extractor.py # Tool for extracting assertions
+|
+├── answers.txt               # File containing answers to questions
+├── Dockerfile                # Docker configuration for containerization
+├── requirements.txt          # Python dependencies for the project
+└── run.sh                    # Helper script to run the tool locally
 ---
 
 ## Prerequisites
