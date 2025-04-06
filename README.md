@@ -8,9 +8,9 @@
 
 ## Features
 
-- Extracts `assert` statements from a github repository.
+- Extracts `test assertions` from a github repository.
 - Handles inheritance and tracks assertions within class hierarchies.
-- Generates reports in csv formats.
+- Generates reports in csv format.
 - Includes a **Streamlit-based GUI** for ease of use.
 - Supports running locally or via Docker.
 
