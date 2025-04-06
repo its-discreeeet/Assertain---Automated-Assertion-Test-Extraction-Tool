@@ -33,7 +33,7 @@ if st.button("Extract Assertions"):
                 repo_dir = clone_github_repo(github_url)
                 progress_bar.progress(25)
                 
-                # find the test files
+              
                 test_files = get_test_files(repo_dir)
                 st.info(f"Found {len(test_files)} test files")
                 progress_bar.progress(50)
@@ -64,11 +64,11 @@ if st.button("Extract Assertions"):
                    
                     result_placeholder.success(f"Found {len(all_assertions)} assertions in {file_count} files")
                     
-                    #tabs for different pages
+                    
                     tab1, tab2, tab3 = st.tabs(["Data", "Visualizations", "Statistics"])
                     
                     with tab1:
-                        # made a table with sortable cols
+                        
                         st.subheader("Assertion Data")
                         st.dataframe(df, use_container_width=True)
                         
@@ -83,15 +83,15 @@ if st.button("Extract Assertions"):
                     with tab2:
                         st.subheader("Visualization Dashboard")
                         
-                        # 2 columns (cols for short) for charts
+                       
                         col1, col2 = st.columns(2)
                         
                         with col1:
                            
-                            # 1. Assertions per file (top 10)
+                            #Assertions per file (top 10)
                             file_counts = df['filepath'].value_counts().reset_index().head(10)
                             file_counts.columns = ['Filepath', 'Count']
-                            # Extract just the filename from the full path for cleaner display
+                            
                             file_counts['Filename'] = file_counts['Filepath'].apply(lambda x: os.path.basename(x))
                             
                             # bar chart for file dist
@@ -107,13 +107,12 @@ if st.button("Extract Assertions"):
                             st.plotly_chart(fig1, use_container_width=True)
                             
                         with col2:
-                            # 2. pie chart
+                            # pie chart
                             if 'testclass' in df.columns and df['testclass'].notna().sum() > 0:
-                                # Filter out empty test classes and get top classes
+                              
                                 class_counts = df[df['testclass'] != '']['testclass'].value_counts().reset_index()
                                 class_counts.columns = ['Test Class', 'Count']
-                                
-                                # top 10 classes, we group the reamining ones as 'others'
+                               
                                 top_classes = class_counts.head(10)
                                 if len(class_counts) > 10:
                                     others_count = class_counts['Count'][10:].sum()
@@ -137,7 +136,7 @@ if st.button("Extract Assertions"):
                         col3, col4 = st.columns(2)
                         
                         with col3:
-                            # 3. assertion types (looking for patterns in assertion strings)
+                           
                             def categorize_assertion(assert_str):
                                 assert_str = assert_str.lower()
                                 if "equal" in assert_str:
@@ -175,7 +174,7 @@ if st.button("Extract Assertions"):
                             st.plotly_chart(fig3, use_container_width=True)
                         
                         with col4:
-                            # 4. Directory heatmap (it shows the assertion concentration by directory basically)
+                            
                             df['directory'] = df['filepath'].apply(lambda x: os.path.dirname(x).split('/')[-1] if '/' in x else 'root')
                             dir_counts = df['directory'].value_counts().reset_index().head(15)
                             dir_counts.columns = ['Directory', 'Count']
@@ -234,7 +233,7 @@ if st.button("Extract Assertions"):
                     progress_placeholder.empty()
                     result_placeholder.warning("No assertions found in this repository")
                 
-                # clean up the temp directory after use is over
+               
                 import shutil
                 shutil.rmtree(repo_dir, ignore_errors=True)
                 
@@ -242,7 +241,7 @@ if st.button("Extract Assertions"):
                 progress_placeholder.empty()
                 result_placeholder.error(f"Error: {str(e)}")
 
-# some documentation for guidance
+
 with st.expander("How it works"):
     st.markdown("""
     ### How the Assertion Extractor Works
