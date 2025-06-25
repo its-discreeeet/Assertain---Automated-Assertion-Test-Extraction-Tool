@@ -1,6 +1,4 @@
-## Assertion Extractor Tool
-
-**Assertion Extractor** is a Python-based tool to extract assertions from Python test files from a github repository. This tool also contains a streamlit app for the GUI.
+**Assertain** is a Python-based tool to automate extraction assertions from Python test files from a github repository. This tool also contains a streamlit app for the GUI.
 
 ---
 
